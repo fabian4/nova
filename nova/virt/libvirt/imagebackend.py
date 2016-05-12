@@ -616,16 +616,17 @@ class Rbd(Image):
         if path:
             try:
                 self.rbd_name = path.split('/')[1]
+                self.pool = path.split('/')[0].split(':')[1]
             except IndexError:
                 raise exception.InvalidDevicePath(path=path)
         else:
             self.rbd_name = '%s_%s' % (instance['uuid'], disk_name)
+            self.pool = CONF.libvirt.images_rbd_pool
 
         if not CONF.libvirt.images_rbd_pool:
             raise RuntimeError(_('You should specify'
                                  ' images_rbd_pool'
                                  ' flag to use rbd images.'))
-        self.pool = CONF.libvirt.images_rbd_pool
         self.discard_mode = get_hw_disk_discard(
                 CONF.libvirt.hw_disk_discard)
         self.rbd_user = CONF.libvirt.rbd_user
