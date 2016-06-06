@@ -2091,6 +2091,8 @@ class API(base.Base):
             'image_type': image_type,
         }
         image_ref = instance.image_ref
+        if not image_ref:
+            image_ref = compute_utils.get_image_ref(context, instance)
         sent_meta = compute_utils.get_image_metadata(
             context, self.image_api, image_ref, instance)
 
