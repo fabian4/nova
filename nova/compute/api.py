@@ -1774,10 +1774,15 @@ class API(base.Base):
         """Terminate an instance."""
         LOG.debug('Going to try to soft delete instance',
                   instance=instance)
-
-        self._delete(context, instance, 'soft_delete', self._do_soft_delete,
-                     task_state=task_states.SOFT_DELETING,
-                     deleted_at=timeutils.utcnow())
+        if instance['vm_state'] == vm_states.SOFT_DELETED:
+            LOG.warn("Instance %s is soft delete state" % (instance.uuid))
+            reason = ("The instance is %s state" % (instance.vm_state))
+            raise exception.InstanceTerminationFailure(reason=reason)
+        else:
+            self._delete(context, instance, 'soft_delete',
+                         self._do_soft_delete,
+                         task_state=task_states.SOFT_DELETING,
+                         deleted_at=timeutils.utcnow())
 
     def _delete_instance(self, context, instance):
         self._delete(context, instance, 'delete', self._do_delete,
