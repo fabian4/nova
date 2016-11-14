@@ -572,6 +572,9 @@ class Controller(wsgi.Controller):
             search_opts['deleted'] = strutils.bool_from_string(
                 search_opts['deleted'], default=False)
 
+        if search_opts.get("vm_state") == ['soft-delete']:
+            search_opts['deleted'] = True
+
         if search_opts.get("vm_state") == ['deleted']:
             if context.is_admin:
                 search_opts['deleted'] = True
